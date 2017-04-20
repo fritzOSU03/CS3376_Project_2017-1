@@ -9,13 +9,33 @@
 
 int main(int argc, char *argv[])
 {
-	//Make UDP Connection.
-  
-  //Receive struct in recvfrom in while loop.
-  
-  //Call appendLog(logMessage)
-  
-  //Reply to caller with buffer.
-  
+	//Define variables.
+	
+	//Set serv_addr to all zeros.
+	
+	//Create the socket.
+	
+	//Bind the socket to the address.
+	
+	//Get the size of the client address structure.
+	
+	//Loop infinitely to receive connections.
+	while(1) {
+		//Set message to all zeros.
+		
+		//Receive the logMessage from the client.
+		
+		//Convert logMessage.time to a tm struct.
+		
+		//Find and clear the line return from logMessage.message.
+		
+		//Print the message.
+		
+		//Write to the log file.
+		
+		//Write the response to the client.
+		
+	}
+	
 	return 0;
 }

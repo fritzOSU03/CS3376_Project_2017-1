@@ -124,6 +124,19 @@ int callLogServer(logMessage &message)
 // Designed by Kevin Shah and Brennan Stuewe
 int appendLog(logMessage &message)
 {
+	//Create local variables.
+	
+	//Set local logMessage.message to all zeros.
+	
+	//Setup the logMessage data.
+	
+	//Setup the echo.log file.
+	
+	//Convert the logMessage.time to a tm struct.
+	
+	//Write the data to echo.log.
+	
+	//Close echo.log.
 	
 	return 0;
 }

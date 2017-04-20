@@ -8,18 +8,6 @@
 // Description:
 // 	This program initiates a TCP/UDP echo server. Requires server_functions.c.
 
-#include <errno.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <sys/select.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include "server_functions.h"
-
 
 #include <errno.h>
 #include <signal.h>

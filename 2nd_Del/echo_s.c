@@ -21,6 +21,19 @@
 #include "server_functions.h"
 
 
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include "server_functions.h"
+
+
 int main(int argc, char *argv[])
 {
 	int tcpfd[argc - 1];
@@ -31,6 +44,7 @@ int main(int argc, char *argv[])
 	ssize_t n;
 	socklen_t clilen;
 	struct sockaddr_in cli_addr, serv_addr;
+	struct logMessage message;
 	char buffer[1024];
 	
 	//Error if too few or too many port numbers provided.
@@ -78,7 +92,7 @@ int main(int argc, char *argv[])
 	FD_ZERO(&rset);
 	
 	//Add one to the larger of the two file descriptors.
-	maxfdp1 = -1;//fmax(tcpfd[0], udpfd[0]) + 1;
+	maxfdp1 = -1;
 	
 	//Loop infinitely to handle connections.
 	while(1) {
@@ -109,6 +123,9 @@ int main(int argc, char *argv[])
 			}
 		}
 		
+		//Record the time of the call.
+		message.dateTime = time(0);
+		
 		//If tcpfd was added, process TCP communication.
 		if(FD_ISSET(tfd, &rset)) {
 			clilen = sizeof(cli_addr);
@@ -123,7 +140,11 @@ int main(int argc, char *argv[])
 			//Handle the transmission in the child.
 			if(childpid == 0) {
 				close(tfd);
-				procTransT(newtcpfd);
+				
+				//Get the client address.
+				message.address = cli_addr.sin_addr.s_addr;
+				
+				procTransT(newtcpfd, message);
 				exit(0);
 			}
 			
@@ -143,8 +164,14 @@ int main(int argc, char *argv[])
 			if(n < 0) error("ERROR receiving from socket ");
 			
 			//Print the message.
-			write(1, "UDP message: ", 13);
-			write(1, buffer, n);
+			printf("UDP message: %s", buffer);
+			
+			//Create the logMessage struct.
+			message.address = cli_addr.sin_addr.s_addr;
+			bcopy((char *)buffer, (char *)message.message, 1023);
+			
+			//Call the log_s.
+			callLogServer(message);
 			
 			//Write the response to the client.
 			n = sendto(ufd, buffer, 1024, 0, (struct sockaddr *)&cli_addr, clilen);

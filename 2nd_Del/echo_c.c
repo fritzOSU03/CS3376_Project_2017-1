@@ -1,7 +1,9 @@
 // File: echo_c.c
+// Contributors:
 //    James Fritz       jkf150030
 //    Duc Nguyen        dqn150030
 //    Luke Pettinger    flp081000
+//    Kevin Shah        kjs160330
 //    Brennan Stuewe    brs140230
 //    Chase Vriezema    cmv140030
 // Date: 04/23/2017
@@ -53,10 +55,10 @@ int main(int argc, char *argv[])
 	printf("Enter a message: ");
 	
 	//Reset the buffer.
-	bzero(buffer, 1024);
+	bzero(buffer, sizeof(buffer));
 	
 	//Read from stdin to the buffer.
-	fgets(buffer, 1023, stdin);
+	fgets(buffer, sizeof(buffer) - 1, stdin);
 	
 	//Write the information to the server.
 	if(useUDP)	n = sendto(sockfd, buffer, strlen(buffer), 0, (const struct sockaddr *)&serv_addr, length);
@@ -64,11 +66,11 @@ int main(int argc, char *argv[])
 	if(n < 0)	error("ERROR writing to socket ");
 	
 	//Reset the buffer.
-	if(!useUDP) bzero(buffer, 1024);
+	if(!useUDP) bzero(buffer, sizeof(buffer));
 	
 	//Read the reply from the server.
-	if(useUDP)	n = recvfrom(sockfd, buffer, 1024, 0, (struct sockaddr *)&serv_resp, &length);
-	else		n = read(sockfd, buffer, 1023);
+	if(useUDP)	n = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&serv_resp, &length);
+	else		n = read(sockfd, buffer, sizeof(buffer) - 1);
 	if(n < 0)	error("ERROR reading from socket ");
 	
 	//Print the reply from the server.

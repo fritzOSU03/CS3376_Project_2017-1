@@ -40,10 +40,10 @@ void procTransT(int socket, logMessage &message)
 	char buffer[1024];
 	
 	//Reset the buffer.
-	bzero(buffer, 1024);
+	bzero(buffer, sizeof(buffer));
 	
 	//Read the information from the client.
-	n = read(socket, buffer, 1023);
+	n = read(socket, buffer, sizeof(buffer) - 1);
 	if(n < 0) error("ERROR reading from socket ");
 	
 	//Print the message.
@@ -52,7 +52,7 @@ void procTransT(int socket, logMessage &message)
 	//Create the logMessage struct.
 	logMsg.address = message.address;
 	logMsg.dateTime = message.dateTime;
-	bcopy((char *)buffer, (char *)logMsg.message, 1023);
+	bcopy((char *)buffer, (char *)logMsg.message, sizeof(buffer) - 1);
 	
 	//Call the log_s.
 	callLogServer(logMsg);
@@ -61,7 +61,6 @@ void procTransT(int socket, logMessage &message)
 	n = write(socket, buffer, sizeof(buffer));
 	if(n < 0) error("ERROR writing to socket ");
 }
-
 
 int setupSocket(int type, sockaddr_in &serv_addr, int port_no)
 {
@@ -106,10 +105,10 @@ int callLogServer(logMessage &message)
 	if(n < 0) error("ERROR sending to socket ");
 	
 	//Reset the buffer.
-	bzero(buffer, 1024);
+	bzero(buffer, sizeof(buffer));
 	
 	//Read the reply from the server.
-	n = recvfrom(sockfd, buffer, 1024, 0, (struct sockaddr *)&serv_resp, &length);
+	n = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&serv_resp, &length);
 	if(n < 0) error("ERROR receiving from socket ");
 	
 	//Print the reply from the server.
@@ -122,21 +121,35 @@ int callLogServer(logMessage &message)
 }
 
 // Designed by Kevin Shah and Brennan Stuewe
-int appendLog(logMessage &message)
+int appendLog(logMessage &logMsg)
 {
-	//Create local variables.
-	
-	//Set local logMessage.message to all zeros.
-	
-	//Setup the logMessage data.
-	
 	//Setup the echo.log file.
+	FILE *logFile = fopen("echo.log", "a");
 	
-	//Convert the logMessage.time to a tm struct.
-	
-	//Write the data to echo.log.
+	if(logFile == NULL) error("Error opening file ");
+	else {
+		//Convert the given time to a tm struct.
+		struct tm * now = localtime(&logMsg.dateTime);
+		
+		//Write the data to echo.log.
+		fprintf(
+			logFile,
+			"%.4d-%.2d-%.2d %.2d:%.2d:%.2d	\"%s\" was received from %d.%d.%d.%d\n",
+			(now->tm_year + 1900),
+			(now->tm_mon + 1),
+			now->tm_mday,
+			now->tm_hour,
+			now->tm_min,
+			now->tm_sec,
+			logMsg.message,
+			int(logMsg.address&0xFF),
+			int((logMsg.address&0xFF00)>>8),
+			int((logMsg.address&0xFF0000)>>16),
+			int((logMsg.address&0xFF000000)>>24));
+	}
 	
 	//Close echo.log.
+	fclose(logFile);
 	
 	return 0;
 }

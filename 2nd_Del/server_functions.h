@@ -1,8 +1,11 @@
 // File: server_functions.h
+// Contributors:
 //    James Fritz       jkf150030
+//    Duc Nguyen        dqn150030
 //    Luke Pettinger    flp081000
+//    Kevin Shah        kjs160330
+//    Brennan Stuewe    brs140230
 //    Chase Vriezema    cmv140030
-
 // Date: 04/23/2017
 // Purpose: CS3376
 // Description:

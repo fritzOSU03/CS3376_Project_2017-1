@@ -1,13 +1,11 @@
 // File: echo_s.c
 // Contributors:
-//    James Fritz		jkf150030
-//    Chase Vriezema	cmv140030
-//    
+//    James Fritz       jkf150030
+//    Chase Vriezema    cmv140030
 // Date: 04/23/2017
 // Purpose: CS3376
 // Description:
 // 	This program initiates a TCP/UDP echo server. Requires server_functions.c.
-
 
 #include <errno.h>
 #include <signal.h>
@@ -145,10 +143,10 @@ int main(int argc, char *argv[])
 			clilen = sizeof(cli_addr);
 			
 			//Reset the buffer.
-			bzero(buffer, 1024);
+			bzero(buffer, sizeof(buffer));
 			
 			//Receive the information from the client.
-			n = recvfrom(ufd, buffer, 1024, 0, (struct sockaddr *)&cli_addr, &clilen);
+			n = recvfrom(ufd, buffer, sizeof(buffer), 0, (struct sockaddr *)&cli_addr, &clilen);
 			if(n < 0) error("ERROR receiving from socket ");
 			
 			//Print the message.
@@ -156,13 +154,13 @@ int main(int argc, char *argv[])
 			
 			//Create the logMessage struct.
 			message.address = cli_addr.sin_addr.s_addr;
-			bcopy((char *)buffer, (char *)message.message, 1023);
+			bcopy((char *)buffer, (char *)message.message, sizeof(buffer) - 1);
 			
 			//Call the log_s.
 			callLogServer(message);
 			
 			//Write the response to the client.
-			n = sendto(ufd, buffer, 1024, 0, (struct sockaddr *)&cli_addr, clilen);
+			n = sendto(ufd, buffer, sizeof(buffer), 0, (struct sockaddr *)&cli_addr, clilen);
 			if(n < 0) error("ERROR sending to socket ");
 		}
 	}
